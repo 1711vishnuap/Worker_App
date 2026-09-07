@@ -7,9 +7,11 @@ const router = express.Router();
 const authRoutes = require('../modules/auth/auth.routes');
 const workRoutes = require('../modules/works/work.routes');
 const workerRoutes = require('../modules/workers/worker.routes');
+const categoryRoutes = require('../modules/categories/category.routes'); 
 
 router.use('/auth', authRoutes);
 router.use('/works', workRoutes);
 router.use('/workers', workerRoutes);
+router.use('/categories', categoryRoutes);
 
 module.exports = router;

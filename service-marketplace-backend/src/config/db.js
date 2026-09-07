@@ -13,7 +13,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true, // return DATETIME/TIMESTAMP as plain strings, simpler for beginners
+  dateStrings: true,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Quick helper to test the DB connection on server startup.
@@ -23,7 +26,7 @@ async function testConnection() {
     console.log('✅ MySQL connected successfully');
     connection.release();
   } catch (err) {
-    console.error('❌ Failed to connect to MySQL:', err.message);
+    console.error('❌ Failed to connect to MySQL:', err);
     process.exit(1);
   }
 }
