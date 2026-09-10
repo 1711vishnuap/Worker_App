@@ -12,8 +12,7 @@ class ApiConstants {
   // BASE URL — change this depending on where your backend is running
   // ---------------------------------------------------------------
   // Android emulator -> host machine's localhost:
-  static const String baseUrl =
-      'https://service-marketplace-backend-13ky.onrender.com/api';
+  static const String baseUrl = 'http://192.168.1.43:3001/api';
 
   // iOS simulator (uncomment if using iOS simulator instead):
   // static const String baseUrl = 'http://localhost:5000/api';
