@@ -27,9 +27,12 @@ class _MyWorksScreenState extends State<MyWorksScreen> {
     }
   }
 
-  void _openWork(WorkModel work) {
-    final route = work.status == WorkStatus.completed ? AppRoutes.completedWork : AppRoutes.workTracking;
-    Navigator.pushNamed(context, route, arguments: work.id);
+  Future<void> _openWork(WorkModel work) async {
+    final route = work.status == WorkStatus.completed
+        ? AppRoutes.completedWork
+        : AppRoutes.workTracking;
+    await Navigator.pushNamed(context, route, arguments: work.id);
+    if (mounted) await context.read<WorkProvider>().loadMyWorks();
   }
 
   @override
@@ -42,12 +45,15 @@ class _MyWorksScreenState extends State<MyWorksScreen> {
       child: isLoading && works.isEmpty
           ? const LoadingIndicator()
           : works.isEmpty
-              ? const EmptyState(icon: Icons.list_alt_outlined, message: 'You haven\'t posted any work yet')
+              ? const EmptyState(
+                  icon: Icons.list_alt_outlined,
+                  message: 'You haven\'t posted any work yet')
               : ListView.separated(
                   padding: const EdgeInsets.all(20),
                   itemCount: works.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) => WorkCard(work: works[index], onTap: () => _openWork(works[index])),
+                  itemBuilder: (context, index) => WorkCard(
+                      work: works[index], onTap: () => _openWork(works[index])),
                 ),
     );
 
@@ -58,7 +64,8 @@ class _MyWorksScreenState extends State<MyWorksScreen> {
             padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('My Works', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              child: Text('My Works',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             ),
           ),
           Expanded(child: body),

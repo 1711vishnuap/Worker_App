@@ -39,16 +39,16 @@ class _AddWorkScreenState extends State<AddWorkScreen> {
 
   Future<void> _captureLocation() async {
     setState(() => _locatingInProgress = true);
-    final position = await _locationService.getCurrentLocation();
+    final result = await _locationService.getCurrentLocation();
     if (!mounted) return;
     setState(() {
-      _lat = position?.latitude;
-      _lng = position?.longitude;
+      _lat = result.position?.latitude;
+      _lng = result.position?.longitude;
       _locatingInProgress = false;
     });
-    if (position == null && mounted) {
+    if (result.error != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not get your location. Please enable location services.')),
+        SnackBar(content: Text(result.error!)),
       );
     }
   }

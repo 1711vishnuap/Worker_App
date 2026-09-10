@@ -36,7 +36,7 @@ class ShowOtpScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: AppColors.primary, width: 1.5),
                 ),

@@ -202,4 +202,55 @@ async function getWorkWorker(customerId, workId) {
   return rows[0];
 }
 
-module.exports = { createWork, getMyWorks, getWorkById, getWorkWorker };
+// PATCH /api/works/:id  (customer edits title/description of their own work)
+// Only allowed when status is POSTED or NOTIFIED.
+async function updateWork(customerId, workId, payload) {
+  const [rows] = await pool.query('SELECT * FROM works WHERE id = ?', [workId]);
+  const work = rows[0];
+
+  if (!work) throw new AppError('Work not found', 404);
+  if (work.customer_id !== customerId) throw new AppError('Not your work', 403);
+  if (!['POSTED', 'NOTIFIED'].includes(work.status)) {
+    throw new AppError('Cannot edit a work that has already been accepted by a worker', 400);
+  }
+
+  const title = payload.title?.trim();
+  const description = payload.description?.trim() ?? null;
+
+  if (!title) throw new AppError('Title is required', 400);
+
+  await pool.query(
+    `UPDATE works SET title = ?, description = ? WHERE id = ?`,
+    [title, description, workId]
+  );
+
+  const [updated] = await pool.query(
+    `SELECT w.*, c.name AS category_name FROM works w JOIN categories c ON c.id = w.category_id WHERE w.id = ?`,
+    [workId]
+  );
+  return updated[0];
+}
+
+// DELETE /api/works/:id
+// Only allowed when status is POSTED or NOTIFIED — not after a worker accepted.
+async function cancelWork(customerId, workId) {
+  const [rows] = await pool.query('SELECT * FROM works WHERE id = ?', [workId]);
+  const work = rows[0];
+
+  if (!work) throw new AppError('Work not found', 404);
+  if (work.customer_id !== customerId) throw new AppError('Not your work', 403);
+  if (!['POSTED', 'NOTIFIED'].includes(work.status)) {
+    throw new AppError('Cannot cancel a work that has already been accepted by a worker', 400);
+  }
+
+  await pool.query(`UPDATE works SET status = 'CANCELLED' WHERE id = ?`, [workId]);
+  await pool.query(
+    `INSERT INTO work_status_history (work_id, status) VALUES (?, 'CANCELLED')`,
+    [workId]
+  );
+  return { id: workId, status: 'CANCELLED' };
+}
+
+module.exports = { createWork, getMyWorks, getWorkById, getWorkWorker, updateWork, cancelWork };
+
+

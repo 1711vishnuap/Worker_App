@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../config/app_colors.dart';
 import '../../config/app_routes.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/service_illustration.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,7 +24,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkSession() async {
     final authProvider = context.read<AuthProvider>();
     await authProvider.loadSession();
-    await Future.delayed(const Duration(milliseconds: 800)); // brief brand moment
+    await Future.delayed(
+        const Duration(milliseconds: 800)); // brief brand moment
 
     if (!mounted) return;
 
@@ -45,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.handyman_rounded, color: Colors.white, size: 72),
+            ServiceIllustration(size: 140, fullBody: true),
             SizedBox(height: 16),
             Text(
               'ServiceHub',

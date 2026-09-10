@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../config/app_colors.dart';
 import '../models/work_model.dart';
 import 'status_badge.dart';
+import 'service_illustration.dart';
 
 class WorkCard extends StatelessWidget {
   final WorkModel work;
@@ -19,43 +20,52 @@ class WorkCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      work.title,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  StatusBadge(status: work.status),
-                ],
-              ),
-              const SizedBox(height: 6),
-              if (work.categoryName != null)
+          child: Row(children: [
+            ServiceIllustration(
+                category: work.categoryName ?? 'Repair', size: 55),
+            const SizedBox(width: 12),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  work.categoryName!,
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  work.title,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w800),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              if (work.distanceKm != null) ...[
                 const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 16, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${work.distanceKm} km away',
-                      style: const TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
+                if (work.categoryName != null)
+                  Text(
+                    work.categoryName!,
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 11),
+                  ),
+                const SizedBox(height: 10),
+                StatusBadge(status: work.status),
+                if (work.distanceKm != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          size: 16, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${work.distanceKm} km away',
+                        style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
               ],
-            ],
-          ),
+            )),
+            const Icon(Icons.chevron_right_rounded,
+                size: 20, color: AppColors.textSecondary),
+          ]),
         ),
       ),
     );

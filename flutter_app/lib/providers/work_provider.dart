@@ -17,13 +17,20 @@ class WorkProvider extends ChangeNotifier {
 
   bool isLoading = false;
   String? errorMessage;
+  bool categoriesLoading = false;
+  String? categoriesError;
 
   Future<void> loadCategories() async {
+    if (categoriesLoading) return;
+    categoriesLoading = true;
+    categoriesError = null;
+    notifyListeners();
     try {
       categories = await _workService.getCategories();
-      notifyListeners();
     } catch (e) {
-      errorMessage = e.toString();
+      categoriesError = e.toString();
+    } finally {
+      categoriesLoading = false;
       notifyListeners();
     }
   }
@@ -92,6 +99,47 @@ class WorkProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateWork(int workId,
+      {required String title, String? description}) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final updated = await _workService.updateWork(workId,
+          title: title, description: description);
+      currentWork = updated;
+      final idx = myWorks.indexWhere((w) => w.id == workId);
+      if (idx != -1) myWorks[idx] = updated;
+      errorMessage = null;
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> cancelWork(int workId) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _workService.cancelWork(workId);
+      myWorks = myWorks.map((w) {
+        if (w.id == workId) return w.copyWithStatus(WorkStatus.cancelled);
+        return w;
+      }).toList();
+      errorMessage = null;
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }

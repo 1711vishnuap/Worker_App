@@ -47,4 +47,15 @@ class WorkService {
     final data = await _api.get(ApiConstants.workWorker(id));
     return AssignedWorkerModel.fromJson(data);
   }
+  Future<WorkModel> updateWork(int workId, {required String title, String? description}) async {
+    final data = await _api.patch(ApiConstants.updateWork(workId), body: {
+      'title': title,
+      'description': description,
+    });
+    return WorkModel.fromJson(data);
+  }
+
+  Future<void> cancelWork(int workId) async {
+    await _api.delete(ApiConstants.cancelWork(workId));
+  }
 }

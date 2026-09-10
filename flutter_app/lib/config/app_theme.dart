@@ -14,17 +14,40 @@ class AppTheme {
       primary: AppColors.primary,
       surface: AppColors.surface,
     ),
-    fontFamily: 'Roboto',
+    fontFamily: 'Manrope',
+    textTheme: const TextTheme(
+      headlineMedium: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -1.1,
+          color: AppColors.textPrimary),
+      titleLarge: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.6,
+          color: AppColors.textPrimary),
+      titleMedium: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.4,
+          color: AppColors.textPrimary),
+      bodyMedium:
+          TextStyle(fontSize: 14, height: 1.5, color: AppColors.textPrimary),
+      bodySmall:
+          TextStyle(fontSize: 12, height: 1.5, color: AppColors.textSecondary),
+    ),
 
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.background,
       foregroundColor: AppColors.textPrimary,
       elevation: 0,
-      centerTitle: false,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
       titleTextStyle: TextStyle(
         color: AppColors.textPrimary,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
+        fontFamily: 'Manrope',
+        fontSize: 18,
+        fontWeight: FontWeight.w800,
       ),
     ),
 
@@ -35,7 +58,8 @@ class AppTheme {
         foregroundColor: Colors.white,
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+            fontFamily: 'Manrope', fontSize: 16, fontWeight: FontWeight.w700),
         elevation: 0,
       ),
     ),
@@ -45,13 +69,14 @@ class AppTheme {
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         side: const BorderSide(color: AppColors.border, width: 1.5),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+            fontFamily: 'Manrope', fontSize: 16, fontWeight: FontWeight.w700),
       ),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: const Color(0xFFF1F3F7),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -83,7 +108,27 @@ class AppTheme {
       unselectedItemColor: AppColors.textSecondary,
       showUnselectedLabels: true,
       type: BottomNavigationBarType.fixed,
-      elevation: 8,
+      elevation: 0,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: Colors.transparent,
+      indicatorColor: AppColors.primaryLight,
+      height: 74,
+      labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
+            fontFamily: 'Manrope',
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: states.contains(WidgetState.selected)
+                ? AppColors.primary
+                : AppColors.textSecondary,
+          )),
+      iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(
+            size: 23,
+            color: states.contains(WidgetState.selected)
+                ? AppColors.primary
+                : AppColors.textSecondary,
+          )),
     ),
   );
 }
