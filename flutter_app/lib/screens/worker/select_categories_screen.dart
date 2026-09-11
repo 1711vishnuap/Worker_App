@@ -1,17 +1,14 @@
-// lib/screens/worker/select_categories_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_colors.dart';
-import '../../models/category_model.dart';
 import '../../providers/work_provider.dart';
 import '../../providers/worker_provider.dart';
 import '../../widgets/loading_indicator.dart';
+import '../../widgets/marketplace_widgets.dart';
 import '../../widgets/primary_button.dart';
 
 class SelectCategoriesScreen extends StatefulWidget {
   const SelectCategoriesScreen({super.key});
-
   @override
   State<SelectCategoriesScreen> createState() => _SelectCategoriesScreenState();
 }
@@ -23,83 +20,112 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<WorkProvider>().loadCategories();
+      if (mounted) context.read<WorkProvider>().loadCategories();
     });
   }
 
   Future<void> _save() async {
     if (_selected.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one category')),
-      );
+          const SnackBar(content: Text('Please select at least one service')));
       return;
     }
-    final success = await context.read<WorkerProvider>().setCategories(_selected.toList());
+    final success =
+        await context.read<WorkerProvider>().setCategories(_selected.toList());
     if (!mounted) return;
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Categories saved')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Services saved')));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.read<WorkerProvider>().errorMessage ?? 'Failed to save')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(context.read<WorkerProvider>().errorMessage ??
+              'Failed to save')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final categories = context.watch<WorkProvider>().categories;
-    final isLoading = context.watch<WorkerProvider>().isLoading;
-
+    final provider = context.watch<WorkProvider>();
+    final isSaving = context.watch<WorkerProvider>().isLoading;
     return Scaffold(
-      appBar: AppBar(title: const Text('Select Your Services')),
-      body: categories.isEmpty
-          ? const LoadingIndicator()
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: categories.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final CategoryModel category = categories[index];
-                      final selected = _selected.contains(category.id);
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () => setState(() {
-                          selected ? _selected.remove(category.id) : _selected.add(category.id);
-                        }),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: selected ? AppColors.primary.withOpacity(0.08) : AppColors.surface,
-                            border: Border.all(color: selected ? AppColors.primary : AppColors.border, width: 1.5),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                selected ? Icons.check_circle : Icons.circle_outlined,
-                                color: selected ? AppColors.primary : AppColors.textSecondary,
-                              ),
-                              const SizedBox(width: 14),
-                              Text(category.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: PrimaryButton(label: 'Save', isLoading: isLoading, onPressed: _save),
-                ),
-              ],
-            ),
+      appBar: AppBar(title: const Text('My services')),
+      body: SafeArea(
+          child: Column(children: [
+        const Padding(
+            padding: EdgeInsets.fromLTRB(22, 12, 22, 24),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Put your skills to work.',
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -.7)),
+              SizedBox(height: 8),
+              Text(
+                  'Select all the services you want to offer. We’ll match you with nearby requests.',
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+            ])),
+        Expanded(
+            child: provider.categoriesLoading && provider.categories.isEmpty
+                ? const LoadingIndicator()
+                : provider.categoriesError != null &&
+                        provider.categories.isEmpty
+                    ? Center(
+                        child: RetryPanel(
+                            message: 'We couldn’t load services.',
+                            onRetry: provider.loadCategories))
+                    : provider.categories.isEmpty
+                        ? const EmptyState(
+                            icon: Icons.grid_view_rounded,
+                            message: 'No services available yet')
+                        : LayoutBuilder(
+                            builder: (context, constraints) => GridView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 22),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount:
+                                              constraints.maxWidth < 360
+                                                  ? 2
+                                                  : 3,
+                                          crossAxisSpacing: 12,
+                                          mainAxisSpacing: 14,
+                                          mainAxisExtent: 145 +
+                                              (MediaQuery.textScalerOf(context)
+                                                          .scale(12) -
+                                                      12) *
+                                                  2),
+                                  itemCount: provider.categories.length,
+                                  itemBuilder: (_, i) {
+                                    final category = provider.categories[i];
+                                    final selected =
+                                        _selected.contains(category.id);
+                                    return ServiceCategoryTile(
+                                        category: category,
+                                        selected: selected,
+                                        onTap: () {
+                                          if (!isSaving) {
+                                            setState(() {
+                                              selected
+                                                  ? _selected
+                                                      .remove(category.id)
+                                                  : _selected.add(category.id);
+                                            });
+                                          }
+                                        });
+                                  },
+                                ))),
+        Padding(
+            padding: const EdgeInsets.all(22),
+            child: PrimaryButton(
+                label: _selected.isEmpty
+                    ? 'Save services'
+                    : 'Save ${_selected.length} services',
+                isLoading: isSaving,
+                onPressed: _save)),
+      ])),
     );
   }
 }

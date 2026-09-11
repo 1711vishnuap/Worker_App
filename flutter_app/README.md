@@ -16,11 +16,26 @@ anything in `lib/`.
 
 ## 2. Point the app at your backend
 
-Open `lib/config/api_constants.dart` and set `baseUrl`:
-- Android emulator → `http://10.0.2.2:5000/api` (already the default)
-- iOS simulator → `http://localhost:5000/api`
-- Physical device → `http://<your-computer-LAN-IP>:5000/api`
-- Production → your real HTTPS domain
+Pass the backend address when launching the app:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://<your-computer-LAN-IP>:3001/api
+```
+
+- Android emulator → `http://10.0.2.2:3001/api`
+- iOS simulator → `http://127.0.0.1:3001/api`
+- Physical device → `http://<your-computer-LAN-IP>:3001/api`
+- Production → your deployed HTTPS API URL, including `/api`
+
+Without an override, `lib/config/api_constants.dart` uses the current development
+address `http://10.60.189.216:3001/api`. A LAN address can change when switching
+networks. Keep the phone and computer on the same Wi-Fi, leave the backend
+running, and allow local-network access on the phone. Relaunch Flutter when
+changing `--dart-define`; an already installed build retains its previous URL.
+
+To distinguish a network problem from an app problem, open
+`http://<your-computer-LAN-IP>:3001/api/categories` in the phone's browser.
+It should return JSON with the available services.
 
 ## 3. Configure Firebase (for push notifications)
 

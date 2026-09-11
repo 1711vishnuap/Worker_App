@@ -11,19 +11,16 @@ class ApiConstants {
   // ---------------------------------------------------------------
   // BASE URL — change this depending on where your backend is running
   // ---------------------------------------------------------------
-  // Android emulator -> host machine's localhost:
-  static const String baseUrl =
-      'https://service-marketplace-backend-13ky.onrender.com/api';
-
-  // iOS simulator (uncomment if using iOS simulator instead):
-  // static const String baseUrl = 'http://localhost:5000/api';
-
-  // Physical device on the same Wi-Fi as your computer
-  // (replace with your computer's LAN IP):
-  // static const String baseUrl = 'http://192.168.1.10:5000/api';
-
-  // Production:
-  // static const String baseUrl = 'https://your-domain.com/api';
+  // Defaults to the current development Mac on the same Wi-Fi as the phone.
+  // Override per device/network without editing source:
+  // flutter run --dart-define=API_BASE_URL=http://<mac-lan-ip>:3001/api
+  // Android emulator: http://10.0.2.2:3001/api
+  // iOS simulator: http://127.0.0.1:3001/api
+  // Production: use the deployed API's HTTPS URL.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.60.189.216:3001/api',
+  );
 
   // ---------------------------------------------------------------
   // AUTH
@@ -37,7 +34,10 @@ class ApiConstants {
   static const String works = '/works';
   static String myWorks = '/works/my';
   static String workById(dynamic id) => '/works/$id';
+  static String cancelWork(dynamic id) => '/works/$id';
+  static String updateWork(dynamic id) => '/works/$id';
   static String workWorker(dynamic id) => '/works/$id/worker';
+
   static String acceptWork(dynamic id) => '/works/$id/accept';
   static String verifyWorkOtp(dynamic id) => '/works/$id/verify-otp';
   static String completeWork(dynamic id) => '/works/$id/complete';

@@ -6,6 +6,7 @@ import '../../config/app_colors.dart';
 import '../../config/app_routes.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/primary_button.dart';
+import '../../widgets/service_illustration.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,7 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(
       context,
       AppRoutes.otp,
-      arguments: {'mobile_number': mobile, 'user_type': _userType, 'dev_otp': devOtp},
+      arguments: {
+        'mobile_number': mobile,
+        'user_type': _userType,
+        'dev_otp': devOtp
+      },
     );
   }
 
@@ -57,34 +62,64 @@ class _LoginScreenState extends State<LoginScreen> {
     final isLoading = context.watch<AuthProvider>().isLoading;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              const Icon(Icons.handyman_rounded, color: AppColors.primary, size: 48),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+              const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(Icons.home_repair_service_rounded,
+                    color: AppColors.primary, size: 24),
+                SizedBox(width: 8),
+                Text('ServiceHub',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -.5)),
+              ]),
+              const SizedBox(height: 26),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(32)),
+                padding: const EdgeInsets.symmetric(vertical: 22),
+                child: const Center(
+                    child: ServiceIllustration(size: 190, fullBody: true)),
+              ),
+              const SizedBox(height: 28),
               const Text(
-                'Welcome',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                'A helping hand.\nJust when you need it.',
+                style: TextStyle(
+                    fontSize: 27,
+                    height: 1.2,
+                    letterSpacing: -.9,
+                    fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 6),
               const Text(
-                'Enter your mobile number to continue',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
+                'Connect with local professionals.\nMake room for the things you love.',
+                style: TextStyle(
+                    color: AppColors.textSecondary, fontSize: 13, height: 1.6),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // I am a...
-              const Text('I am a', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('How will you use ServiceHub?',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(child: _roleCard('customer', 'Customer', Icons.person_outline)),
+                  Expanded(
+                      child: _roleCard(
+                          'customer', 'I need a service', Icons.home_outlined)),
                   const SizedBox(width: 12),
-                  Expanded(child: _roleCard('worker', 'Worker', Icons.build_outlined)),
+                  Expanded(
+                      child: _roleCard('worker', 'I offer services',
+                          Icons.handyman_outlined)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -101,10 +136,16 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               PrimaryButton(
-                label: 'Send OTP',
+                label: 'Continue',
+                icon: Icons.arrow_forward_rounded,
                 isLoading: isLoading,
                 onPressed: _continue,
               ),
+              const SizedBox(height: 12),
+              const Center(
+                  child: Text('Sign in with your mobile number',
+                      style: TextStyle(
+                          color: AppColors.textSecondary, fontSize: 11))),
             ],
           ),
         ),
@@ -114,29 +155,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _roleCard(String value, String label, IconData icon) {
     final selected = _userType == value;
-    return GestureDetector(
-      onTap: () => setState(() => _userType = value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withOpacity(0.08) : AppColors.surface,
-          border: Border.all(color: selected ? AppColors.primary : AppColors.border, width: 1.5),
+    return Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
           borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: selected ? AppColors.primary : AppColors.textSecondary),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? AppColors.primary : AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
+          onTap: () => setState(() => _userType = value),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.primaryLight : AppColors.surface,
+              border: Border.all(
+                  color: selected ? AppColors.primary : AppColors.border,
+                  width: 1.5),
+              borderRadius: BorderRadius.circular(14),
             ),
-          ],
-        ),
-      ),
-    );
+            child: Column(
+              children: [
+                Icon(icon,
+                    color:
+                        selected ? AppColors.primary : AppColors.textSecondary),
+                const SizedBox(height: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? AppColors.primary : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }

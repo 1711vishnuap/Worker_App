@@ -9,7 +9,7 @@ import '../services/fcm_service.dart';
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final StorageService _storageService = StorageService();
-  final FcmService _fcmService = FcmService();
+  late final FcmService _fcmService = FcmService();
 
   UserModel? _user;
   bool _isLoading = false;

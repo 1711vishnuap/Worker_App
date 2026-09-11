@@ -4,25 +4,50 @@
 
 import 'package:geolocator/geolocator.dart';
 
+class LocationResult {
+  final Position? position;
+  final String? error;
+  const LocationResult({this.position, this.error});
+}
+
 class LocationService {
-  /// Returns the current position, or null if permission was denied
-  /// or location services are off. Callers should show a friendly
-  /// message when null is returned.
-  Future<Position?> getCurrentLocation() async {
+  /// Returns a [LocationResult] with either a position or a human-readable
+  /// error message. Never throws — callers just check result.error.
+  Future<LocationResult> getCurrentLocation() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return null;
+    if (!serviceEnabled) {
+      return const LocationResult(
+          error: 'Location services are turned off. Please enable GPS.');
+    }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return null;
+      if (permission == LocationPermission.denied) {
+        return const LocationResult(error: 'Location permission denied.');
+      }
     }
 
-    if (permission == LocationPermission.deniedForever) return null;
+    if (permission == LocationPermission.deniedForever) {
+      // Open app settings so the user can grant permission manually
+      await Geolocator.openAppSettings();
+      return const LocationResult(
+          error:
+              'Location permission permanently denied. Please allow it in Settings.');
+    }
 
-    return Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    );
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.high),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw Exception('Location timed out'),
+      );
+      return LocationResult(position: position);
+    } catch (e) {
+      return LocationResult(error: 'Could not get location: ${e.toString()}');
+    }
   }
 
   /// Streams live location updates — used by workers to keep their

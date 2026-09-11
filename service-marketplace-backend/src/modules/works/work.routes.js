@@ -23,6 +23,8 @@ router.use(requireAuth);
 // ----- CUSTOMER -----
 router.post('/', requireCustomer, workController.createWork);
 router.get('/my', requireCustomer, workController.getMyWorks);
+router.patch('/:id', requireCustomer, workController.updateWork);
+router.delete('/:id', requireCustomer, workController.cancelWork);
 router.get('/:id/worker', requireCustomer, workController.getWorkWorker);
 
 // ----- SHARED (customer who owns it, or worker assigned to it) -----

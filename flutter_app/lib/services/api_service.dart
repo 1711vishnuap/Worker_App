@@ -96,4 +96,34 @@ class ApiService {
       throw ApiException('Could not connect to server. Check your internet connection.');
     }
   }
+
+  Future<dynamic> patch(String path, {Map<String, dynamic>? body, bool auth = true}) async {
+    try {
+      final response = await http
+          .patch(
+            _uri(path),
+            headers: await _headers(auth: auth),
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Could not connect to server. Check your internet connection.');
+    }
+  }
+
+  Future<dynamic> delete(String path, {bool auth = true}) async {
+    try {
+      final response = await http
+          .delete(_uri(path), headers: await _headers(auth: auth))
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Could not connect to server. Check your internet connection.');
+    }
+  }
 }

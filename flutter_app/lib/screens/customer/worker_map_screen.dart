@@ -32,6 +32,7 @@ class _WorkerMapScreenState extends State<WorkerMapScreen> {
   @override
   void dispose() {
     _pollTimer?.cancel();
+    _mapController?.dispose();
     super.dispose();
   }
 

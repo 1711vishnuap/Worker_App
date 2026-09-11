@@ -115,6 +115,23 @@ class WorkModel {
       distanceKm: _toDouble(json['distance_km']),
     );
   }
+
+  WorkModel copyWithStatus(WorkStatus newStatus) => WorkModel(
+        id: id,
+        customerId: customerId,
+        categoryId: categoryId,
+        categoryName: categoryName,
+        acceptedWorkerId: acceptedWorkerId,
+        title: title,
+        description: description,
+        photoUrl: photoUrl,
+        customerLat: customerLat,
+        customerLng: customerLng,
+        status: newStatus,
+        otpCode: otpCode,
+        createdAt: createdAt,
+        distanceKm: distanceKm,
+      );
 }
 
 class AssignedWorkerModel {

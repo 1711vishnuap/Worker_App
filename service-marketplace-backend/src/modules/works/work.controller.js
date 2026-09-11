@@ -32,4 +32,16 @@ const getWorkWorker = asyncHandler(async (req, res) => {
   success(res, worker, 'Assigned worker fetched');
 });
 
-module.exports = { createWork, getMyWorks, getWorkById, getWorkWorker };
+// PATCH /api/works/:id
+const updateWork = asyncHandler(async (req, res) => {
+  const work = await workService.updateWork(req.user.id, req.params.id, req.body);
+  success(res, work, 'Work updated');
+});
+
+// DELETE /api/works/:id
+const cancelWork = asyncHandler(async (req, res) => {
+  const result = await workService.cancelWork(req.user.id, req.params.id);
+  success(res, result, 'Work cancelled');
+});
+
+module.exports = { createWork, getMyWorks, getWorkById, getWorkWorker, updateWork, cancelWork };
